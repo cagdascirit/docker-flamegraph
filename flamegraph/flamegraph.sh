@@ -10,5 +10,5 @@ mkdir $FILES_OUT
 for f in $FILES_IN; do
 	echo "Processing $f.svg file..."
 	file=${f##*/}
-	perl $BASEDIR/flamegraph.pl ${12} ${13} $f > $FILES_OUT/$file.svg
+	perl $BASEDIR/flamegraph.pl -minwidth ${12} $f > $FILES_OUT/$file.svg
 done

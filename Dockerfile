@@ -29,4 +29,4 @@ RUN apt-get -y remove \
 VOLUME ["/data"]
 
 ENTRYPOINT ["/var/local/flamegraph/flamegraph.sh"]
-CMD ["influxdb","8086","root","root","jvm","username.job.flow.stage.phase","cirit.loadtest.X.1.1","/data/in","/var/local/flamegraph/empty_filter.txt","0","/data/out","-minwidth","0"]
+CMD ["influxdb","8086","root","root","jvm","username.job.flow.stage.phase","cirit.loadtest.X.1.1","/data/in","/var/local/flamegraph/empty_filter.txt","0","/data/out","0"]
