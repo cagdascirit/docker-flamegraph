@@ -15,6 +15,7 @@ RUN apt-get -y update && \
 	pip install blist
 
 ADD flamegraph/* /var/local/flamegraph/
+RUN chmod +x /var/local/flamegraph/*.sh
 
 RUN apt-get -y remove \
 	ca-certificates \
