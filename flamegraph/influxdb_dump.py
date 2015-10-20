@@ -8,7 +8,7 @@ import os
 import shutil
 
 class InfluxDBDump:
-    def __init__(self, host, port, username, password, database, prefix, tag_mapping, filter_filename, out_dir, sort_order):
+    def __init__(self, host, port, username, password, database, prefix, tag_mapping, filter_filename, out_dir, sort_order, start, end):
         self.host = host
         self.port = port
         self.username = username
@@ -22,6 +22,8 @@ class InfluxDBDump:
         # read the filter file and compose a set of strings which should be excluded when exported
         self.filter_exclude = set()
         self.out_dir = out_dir
+        self.start = start
+        self.end = end
         if filter_filename:
             with open(filter_filename) as f:
                 for s in f:
@@ -45,6 +47,10 @@ class InfluxDBDump:
         print "=== Making file %s" % out_filename
         clauses = ["%s ='%s'" % (tag, value) for (tag, value) in tags.iteritems()]
         query = 'select value from /^cpu.trace.*/ where %s' % " and ".join(clauses)
+        if self.start:
+            query += " and time>=\'{}\'".format(self.start)
+        if self.end:
+            query += " and time<=\'{}\'".format(self.end)
         print "running query: %s" % query
         metrics = self.client.query(query)
         try:
@@ -187,6 +193,8 @@ def get_arg_parser():
     parser.add_option('-f', '--filter', dest='filter', help='Filter for strings (list of strings which WON''T go into the output)', metavar='FILTER')
     parser.add_option('-x', '--outputdir', dest='outputdir', help='File Prefix', metavar='FILEPREFIX')
     parser.add_option('-s', '--sortorder', dest='sortorder', help='Sort Order: 0 (default) = by names, 1 = by linenumbers, 2 = skip linenumbers', metavar='FILEPREFIX')
+    parser.add_option('-a', '--start', dest='start', help='time>=start_time(YYYY-MM-DD HH:MM:SS)', metavar='START_TIME')
+    parser.add_option('-b', '--end', dest='end', help='time<=end_time(YYYY-MM-DD HH:MM:SS)', metavar='END_TIME')
     return parser
 
 if __name__ == '__main__':
@@ -200,5 +208,5 @@ if __name__ == '__main__':
     filter_filename = args.filter or None
     out_dir = args.outputdir or ""
     sort_order = args.sortorder or "0"
-    dumper = InfluxDBDump(args.host, port, args.username, args.password, args.database, args.prefix, tag_mapping, filter_filename, out_dir, sort_order)
+    dumper = InfluxDBDump(args.host, port, args.username, args.password, args.database, args.prefix, tag_mapping, filter_filename, out_dir, sort_order, args.start, args.end)
     dumper.run()
